@@ -4,6 +4,7 @@ import com.jebaraj.cms.dto.ComplaintCreateRequest;
 import com.jebaraj.cms.dto.ComplaintResponse;
 import com.jebaraj.cms.dto.ComplaintStatusUpdateRequest;
 import com.jebaraj.cms.service.ComplaintService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class ComplaintController {
     @PostMapping
     public ResponseEntity<ComplaintResponse>
     createComplaint(
-            @RequestBody
+            @Valid @RequestBody
             ComplaintCreateRequest request) {
 
         ComplaintResponse complaint =
@@ -53,7 +54,7 @@ public class ComplaintController {
 
             @PathVariable Long complaintId,
 
-            @RequestBody
+            @Valid @RequestBody
             ComplaintStatusUpdateRequest request) {
 
         ComplaintResponse complaint =

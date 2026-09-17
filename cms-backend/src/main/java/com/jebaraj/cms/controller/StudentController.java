@@ -5,6 +5,7 @@ import com.jebaraj.cms.dto.StudentRegistrationRequest;
 import com.jebaraj.cms.dto.StudentResponse;
 import com.jebaraj.cms.entity.Student;
 import com.jebaraj.cms.service.StudentService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +24,13 @@ public class StudentController {
 
     @PostMapping("/register")
     public ResponseEntity<StudentResponse> registerStudent(
-            @RequestBody StudentRegistrationRequest request) {
+            @Valid @RequestBody StudentRegistrationRequest request) {
 
         StudentResponse savedStudent = studentService.registerStudent(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedStudent);
     }
     @PostMapping("/login")
-    public ResponseEntity<StudentResponse> loginStudent(@RequestBody StudentLoginRequest request){
+    public ResponseEntity<StudentResponse> loginStudent(@Valid @RequestBody StudentLoginRequest request){
         StudentResponse student = studentService.loginStudent(request);
         return ResponseEntity.ok(student);
     }

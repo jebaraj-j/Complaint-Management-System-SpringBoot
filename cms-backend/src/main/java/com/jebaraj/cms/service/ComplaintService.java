@@ -6,6 +6,7 @@ import com.jebaraj.cms.dto.ComplaintStatusUpdateRequest;
 import com.jebaraj.cms.entity.Complaint;
 import com.jebaraj.cms.enums.ComplaintCategory;
 import com.jebaraj.cms.enums.ComplaintStatus;
+import com.jebaraj.cms.exception.ComplaintNotFoundException;
 import com.jebaraj.cms.repository.ComplaintRepository;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,7 @@ public class ComplaintService {
 
     public ComplaintResponse updateComplaintStatus(Long complaintId,
                                            ComplaintStatusUpdateRequest request){
-        Complaint complaint = complaintRepository.findById(complaintId).orElseThrow(() -> new RuntimeException("Complaint Not Found"));
+        Complaint complaint = complaintRepository.findById(complaintId).orElseThrow(() -> new ComplaintNotFoundException("Complaint not found with id : "+ complaintId));
 
         complaint.setStatus(ComplaintStatus.valueOf(request.getStatus().toUpperCase()));
 
