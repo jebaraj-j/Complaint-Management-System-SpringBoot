@@ -7,6 +7,7 @@ import com.jebaraj.cms.entity.Student;
 import com.jebaraj.cms.exception.EmailAlreadyExistsException;
 import com.jebaraj.cms.exception.InvalidCredentialException;
 import com.jebaraj.cms.repository.StudentRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,9 +16,12 @@ import java.time.LocalDateTime;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository, PasswordEncoder passwordEncoder) {
+
         this.studentRepository = studentRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Register Student
@@ -33,7 +37,7 @@ public class StudentService {
 
         student.setName(request.getName());
         student.setEmail(request.getEmail());
-        student.setPassword(request.getPassword());
+        student.setPassword(passwordEncoder.encode(request.getPassword()));
         student.setDepartment(request.getDepartment());
         student.setCreatedAt(LocalDateTime.now());
 
@@ -49,15 +53,14 @@ public class StudentService {
 
         Student student =
                 studentRepository.findByEmail(
-                        request.getEmail());
+                                request.getEmail())
+                        .orElseThrow(() ->
+                                new InvalidCredentialException(
+                                        "Invalid Email or Password"));
 
-        if (student == null) {
-            throw new InvalidCredentialException(
-                    "Invalid Email or Password");
-        }
-
-        if (!student.getPassword()
-                .equals(request.getPassword())) {
+        if (!passwordEncoder.matches(
+                request.getPassword(),
+                student.getPassword())) {
 
             throw new InvalidCredentialException(
                     "Invalid Email or Password");
