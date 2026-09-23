@@ -1,115 +1,139 @@
 import { useState } from "react";
 import api from "../services/api";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import { Link, useNavigate } from "react-router-dom";
+import BrandMark from "../components/ui/BrandMark";
+import AuthIcon from "../components/ui/AuthIcon";
 
 function Register() {
     const navigate = useNavigate();
+    const [formData, setFormData] = useState({ name: "", email: "", password: "", department: "" });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        password: "",
-        department: ""
-    });
+    const fields = [
+        ["name", "Full name", "Enter your name", "user"],
+        ["email", "Email address", "you@example.edu", "email"],
+        ["department", "Department", "Enter your department", "department"],
+    ];
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setErrorMessage("");
     };
 
-    const handleSubmit = async () => {
-
-    try {
-
-        const response =
-            await api.post(
-                "/students/register",
-                formData
-            );
-
-        alert("Registration Successful");
-
-        setFormData({
-            name: "",
-            email: "",
-            password: "",
-            department: ""
-        });
-
-        navigate("/");
-
-        console.log(response.data);
-
-    } catch (error) {
-
-        alert(
-            error.response?.data?.message ||
-            "Registration Failed"
-        );
-
-    }
-};
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setIsSubmitted(true);
+        setErrorMessage("");
+        try {
+            setIsSubmitting(true);
+            await api.post("/students/register", formData);
+            setFormData({ name: "", email: "", password: "", department: "" });
+            navigate("/");
+        } catch (error) {
+            const message = error.response?.data?.message || "Registration failed. Please try again.";
+            setErrorMessage(message);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
-        <>
-        <Navbar/>
-        <div className="page-container">
+        <main className="auth-page">
+            <section className="auth-showcase" aria-label="CCMS overview">
+                <div className="auth-showcase-content">
+                    <div className="auth-product-mark">
+                        <BrandMark inverse />
+                        <span>CCMS</span>
+                    </div>
+                    <p className="auth-eyebrow">Campus Complaint Management System</p>
+                    <h1>Help shape a more responsive campus.</h1>
+                    <p className="auth-showcase-copy">Create your account to report campus issues with clarity and track progress in one place.</p>
+                    <div className="auth-feature-list" aria-label="Platform benefits">
+                        <span>Simple reporting</span>
+                        <span>Clear updates</span>
+                        <span>Better outcomes</span>
+                    </div>
+                </div>
+            </section>
 
-            <div className="auth-card">
+            <section className="auth-panel" aria-labelledby="register-title">
+                <div className="auth-form-wrap">
+                    <p className="auth-kicker">Student registration</p>
+                    <h2 id="register-title">Create your account</h2>
+                    <p className="auth-description">Enter your details to start using CCMS.</p>
 
-                <h2 className="auth-title">
-                    Student Registration
-                </h2>
+                    <form className="auth-form" onSubmit={handleSubmit} noValidate>
+                        {errorMessage && (
+                            <div className="auth-alert" role="alert">{errorMessage}</div>
+                        )}
 
-                <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    placeholder="Enter Name"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                        {fields.map(([name, label, placeholder, icon]) => (
+                            <label className="auth-field" key={name}>
+                                <span>{label}</span>
+                                <span className="auth-input-wrap">
+                                    <AuthIcon type={icon} />
+                                    <input
+                                        type={name === "email" ? "email" : "text"}
+                                        name={name}
+                                        value={formData[name]}
+                                        placeholder={placeholder}
+                                        className="form-control"
+                                        onChange={handleChange}
+                                        aria-invalid={isSubmitted && !formData[name]}
+                                        aria-describedby={isSubmitted && !formData[name] ? `${name}-help` : undefined}
+                                        disabled={isSubmitting}
+                                    />
+                                </span>
+                                {isSubmitted && !formData[name] && (
+                                    <small id={`${name}-help`}>{label} is required.</small>
+                                )}
+                            </label>
+                        ))}
 
-                <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    placeholder="Enter Email"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                        <label className="auth-field">
+                            <span>Password</span>
+                            <span className="auth-input-wrap">
+                                <AuthIcon type="password" />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={formData.password}
+                                    placeholder="Create a password"
+                                    className="form-control auth-password-input"
+                                    onChange={handleChange}
+                                    aria-invalid={isSubmitted && !formData.password}
+                                    aria-describedby={isSubmitted && !formData.password ? "register-password-help" : undefined}
+                                    disabled={isSubmitting}
+                                />
+                                <button
+                                    type="button"
+                                    className="password-toggle"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                    disabled={isSubmitting}
+                                >
+                                    <AuthIcon type={showPassword ? "eyeOff" : "eyeOn"} className="password-toggle-icon" />
+                                </button>
+                            </span>
+                            {isSubmitted && !formData.password && (
+                                <small id="register-password-help">Password is required.</small>
+                            )}
+                        </label>
 
-                <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    placeholder="Enter Password"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                        <button className="btn-green auth-submit" type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? "Creating account..." : "Create account"}
+                        </button>
+                    </form>
 
-                <input
-                    type="text"
-                    name="department"
-                    value={formData.department}
-                    placeholder="Enter Department"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
-
-                <button
-                    className="btn-green" onClick={handleSubmit}>
-
-                    Register
-                </button>
-
-            </div>
-
-        </div>
-        </>
+                    <p className="auth-switch">
+                        Already have an account? <Link to="/">Sign in</Link>
+                    </p>
+                </div>
+            </section>
+        </main>
     );
 }
 
