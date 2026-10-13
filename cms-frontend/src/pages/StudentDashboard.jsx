@@ -230,7 +230,7 @@ function StudentDashboard() {
                                 description="View and track all your complaints"
                             />
                             <ActionCard
-                                disabled
+                                to="/ai-assistant"
                                 icon={ICONS.bot}
                                 label="AI Assistant"
                                 description="Get help from the CCMS assistant"

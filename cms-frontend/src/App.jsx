@@ -6,17 +6,19 @@ import StudentDashboard from "./pages/StudentDashboard";
 import CreateComplaint from "./pages/CreateComplaint";
 import MyComplaints from "./pages/MyComplaints";
 import AdminDashboard from "./pages/AdminDashboard";
+import AIAssistant from "./pages/AIAssistant";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/"                 element={<Login />} />
+        <Route path="/register"         element={<Register />} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/create-complaint" element={<CreateComplaint />} />
-        <Route path="/my-complaints" element={<MyComplaints />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/my-complaints"    element={<MyComplaints />} />
+        <Route path="/admin-dashboard"  element={<AdminDashboard />} />
+        <Route path="/ai-assistant"     element={<AIAssistant />} />
       </Routes>
     </BrowserRouter>
   );
